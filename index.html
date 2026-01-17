@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --domino-width: 60px;
+            --domino-height: 120px;
+            --domino-horizontal-margin: -30px 0;
+            --domino-ponto-size: 12px;
+            --domino-esquerda-direita-height: 58px;
+        }
+
+        .placar {
+            height: 5vh;
+            width: 100%;
+            background-color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+        }
+
+        .divisor_placar {
+            height: 100%;
+            border: 1px solid black;
+        }
+
+        body {
+            background-image: url('frontend/imgs/image.jpeg');
+            /* background-repeat: no-repeat; */
+            /* background-size: cover; */
+        }
+
+        .container {
+            width: 100vw;
+            height: 95vh;
+            display: grid;
+            grid-template-columns: 1fr 3fr 1fr;
+            grid-template-rows: 1fr 3fr 1fr;
+            grid-template-areas:
+                "area1 area1  area1"
+                "area2 meio area3"
+                "area4 area4 area4";
+        }
+
+        .area1 {
+            grid-area: area1;
+            background-color: rgb(218, 99, 99)
+        }
+
+        .area2 {
+            grid-area: area2;
+            background-color: rgb(83, 83, 236)
+        }
+
+        .area2,
+        .area3 {
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        .area2>.domino,
+        .area3>.domino {
+            transform: rotate(90deg);
+            margin: var(--domino-horizontal-margin);
+        }
+
+        .meio {
+            grid-area: meio;
+            position: relative;
+        }
+
+        .area3 {
+            grid-area: area3;
+            background-color: rgb(59, 201, 59)
+        }
+
+        .area4 {
+            grid-area: area4;
+            background-color: rgb(233, 233, 93)
+        }
+
+        .domino {
+            width: var(--domino-width);
+            height: var(--domino-height);
+            border: 1px solid black;
+            margin: 1px;
+            /* box-shadow: 4px 4px 0px #644848; */
+            background-color: rgb(223, 223, 223);
+        }
+
+        .esquerda {
+            width: 100%;
+            height: var(--domino-esquerda-direita-height);
+        }
+
+        .direita {
+            width: 100%;
+            height: var(--domino-esquerda-direita-height);
+        }
+
+        .direita,
+        .esquerda {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .divisor {
+            width: 100%;
+            border: 2px solid black;
+        }
+
+        .ponto {
+            width: var(--domino-ponto-size);
+            height: var(--domino-ponto-size);
+            border-radius: 25px;
+            background-color: black;
+        }
+
+        .player_table {
+            border: 1px solid black;
+            padding: 8px;
+            display: flex;
+            gap: 22px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .selecionavel {
+            box-shadow: 0px 0px 10px 2px rgb(47, 0, 255);
+        }
+
+        .placeholder {
+            width: var(--domino-width);
+            height: var(--domino-height);
+            background-color: #2f00ff59;
+            transition: 1s;
+            box-shadow: 0px 0px 10px rgb(47, 0, 255);
+        }
+
+        .d-none {
+            transition: 1s;
+            display: none;
+        }
+
+        .loading {
+            width: 100vw;
+            height: 100vh;
+            background-color: #0000006b;
+            position: absolute;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card-players-waiting {
+            width: 400px;
+            height: 400px;
+            border-radius: 14px;
+            border: .3px solid rgb(78, 78, 78);
+            box-shadow: 0px 0px 20px 2px rgba(0, 0, 0, 0.521);
+            background-color: #fff;
+
+        }
+
+        .card-players-waiting-header {
+            border-bottom: 1px solid black;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .card-players-waiting-body {
+            padding: 14px;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border: 1px solid black;
+        }
+
+        table td {
+            border: 1px solid black;
+        }
+
+        .spinner {
+            position: absolute;
+            left: 45%;
+            bottom: -100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="loading">
+        <div class="card-players-waiting">
+            <div class="card-players-waiting-header">
+                Aguardando Players
+            </div>
+            <div class="card-players-waiting-body">
+                <table>
+                    <tbody id="loading-body"></tbody>
+                </table>
+
+                <img class="spinner" src="spinner.svg" alt="loading-spinner">
+            </div>
+        </div>
+    </div>
+
+    <div class="placar">
+        <p>Christian Luiz: 15</p>
+        <div class="divisor_placar"></div>
+        <p>Joao Guilherme: 20</p>
+        <div class="divisor_placar"></div>
+        <p>Gabriel Carlos: 5</p>
+        <div class="divisor_placar"></div>
+        <p>Natanael Wilen: 34</p>
+    </div>
+
+    <div class="container">
+        <div id="player_1" class="player_table area1"></div>
+        <div id="player_2" class="player_table area2"></div>
+        <div id="meio" class="meio"></div>
+        <div id="player_3" class="player_table area3"></div>
+        <div id="player_4" class="player_table area4"></div>
+    </div>
+
+    <script src="frontend/js/domino.js"></script>
+    <script src="frontend/js/player.js"></script>
+    <script src="frontend/js/placeholder.js"></script>
+    <script src="frontend/js/jogo.js"></script>
+    <script>
+
+        const adicionarPlayerEmEspera = (playerName) => {
+            document.querySelector('#loading-body').innerHTML += `<tr><td>${playerName}</td></tr>`;
+        }
+
+        let aguardandoPlayers = true;
+
+        const nome = prompt("informe seu nome");
+
+        if (nome) {
+
+            let socket = new WebSocket('ws://172.16.45.93:8080');
+
+            socket.onopen = () => {
+                socket.send(JSON.stringify({
+                    action: "addPlayer",
+                    data: {
+                        nome: nome,
+                    },
+                }));
+            }
+
+            socket.onmessage = (e) => {
+                const response = JSON.parse(e.data);
+
+                const jwt = response.data.jwt; 
+                
+                if (jwt && !localStorage.getItem('hash')) {
+                    localStorage.setItem('hash', jwt);
+                }
+                
+                console.log(response.data);
+                response.data.players.forEach(player => {
+                    adicionarPlayerEmEspera(player.nome);
+                })
+            }
+        }
+
+        const DOMINO_WIDTH = '120';
+        const DOMINO_HEIGHT = '60px';
+
+        jogo = new Jogo();
+
+        placeholder = new Placeholder();
+
+        let player1 = new Player(jogo.pegarMao(), 2);
+        let player2 = new Player(jogo.pegarMao(), 3);
+        let player3 = new Player(jogo.pegarMao(), 1);
+        let player4 = new Player(jogo.pegarMao(), 4);
+
+        player1.renderizarMao();
+        player2.renderizarMao();
+        player3.renderizarMao();
+        player4.renderizarMao();
+
+        player1.nome = "Christian";
+        player2.nome = "João";
+        player3.nome = "Gabriel";
+        player4.nome = "Iury";
+
+        jogo.adicionarPlayer(player1);
+        jogo.adicionarPlayer(player2);
+        jogo.adicionarPlayer(player3);
+        jogo.adicionarPlayer(player4);
+
+        let dominoMovido = null;
+        let dominoSobreposto = null;
+
+        const meio = document.querySelector('#meio');
+
+        const getValores = (element) => {
+            const direita = element.getAttribute('data-direita');
+            const esquerda = element.getAttribute('data-esquerda')
+
+            return [direita, esquerda];
+        }
+
+        document.addEventListener('dragstart', (e) => {
+            dominoMovido = e.target;
+
+            // [direitaPedra, esquerdaPedra] = getValores(dominoMovido);
+
+            const [direita, esquerda] = getValores(dominoMovido);
+
+            placeholder.mostrarPlaceholders(direita, esquerda);
+
+
+            // const [direta, esquerda] = getValores(dominoMovido);
+
+            // const pedras = document.querySelectorAll('[data-mesa=true]');
+
+            // pedras.forEach(pedra => {
+
+            //     [direitaPedra, esquerdaPedra] = getValores(pedra);
+
+            //     if (direitaPedra == direta || esquerdaPedra == esquerda) {
+            //         pedra.classList.add('selecionavel');
+            //     }
+            // })
+        })
+
+        document.addEventListener('dragend', () => {
+
+            placeholder.esconderPlaceholders();
+            // const pedras = document.querySelectorAll('[data-mesa=true]');
+
+            // pedras.forEach(pedra => {
+            //     pedra.classList.remove('selecionavel');
+            // })
+        })
+
+        meio.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        const dropEvent = (e) => {
+            e.preventDefault();
+
+            socket.send('oi iury');
+
+            const [direita, esquerda] = getValores(dominoMovido);
+            const domino = jogo.buscarDomino(direita, esquerda);
+
+            const validacao = jogo.validarJogada(domino);
+
+            if (!validacao) {
+                return;
+            }
+
+            let centroX;
+            let centroY;
+
+            if (jogo.primeiroTurno()) {
+                const meioRects = e.target.getBoundingClientRect();
+                const dominoRects = e.target.getBoundingClientRect();
+
+                centroX = meioRects.left + (meioRects.width / 2);
+                centroY = meioRects.top + (meioRects.height / 2);
+
+                dominoMovido.style.position = 'fixed';
+                dominoMovido.style.left = `${centroX}px`;
+                dominoMovido.style.top = `${centroY}px`;
+                dominoMovido.style.transform = "rotate(0)";
+            }
+
+            dominoMovido.setAttribute('data-mesa', true);
+
+            const metadata = {
+                html: dominoMovido,
+                turno: jogo.turno,
+                player: jogo.players[jogo.jogadorVez],
+                dominoItem: domino,
+                ladoDireito: direita,
+                ladoEsquerdo: esquerda,
+                direcao: validacao.direcao,
+                posicao: validacao.sentido, //vertical ou horizontal
+                ladoAtivo: validacao.ladoAtivo,
+                ladoAtivoNumero: validacao.ladoAtivoNumero
+            }
+
+            dominoMovido = null;
+
+            jogo.efetuarJogada(metadata, validacao.direcao);
+            placeholder.gerarPlaceholders(jogo);
+            jogo.proximoTurno();
+            return;
+
+        }
+
+        meio.addEventListener('drop', (e) => {
+            dominoSobreposto = e.target;
+            dropEvent(e)
+        });
+
+    </script>
+</body>
+
+</html>
