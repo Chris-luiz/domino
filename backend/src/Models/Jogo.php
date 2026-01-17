@@ -9,9 +9,13 @@ use App\Models\Player;
 
 class Jogo
 {
+
+    private bool $start = false;
     private array $pilha = [];
     private $players = [];
     private $numerosSorteados = [];
+
+    private $turno;
 
     const NUMERO_TOTAL = 28;
 
@@ -26,14 +30,41 @@ class Jogo
         }
     }
 
+    public function getStart(): bool
+    {
+        return $this->start;
+    }
+
+    public function start()
+    {
+        $this->start = true;
+        $this->turno = 1;
+
+        foreach (range(0, 3) as $i) {
+            $this->players[$i]->setPedras($this->sortearSetePedras());
+        }
+
+        $vezes = range(1, 4);
+        shuffle($vezes);
+
+        foreach ($vezes as $i => $vez) {
+            $this->players[$i]->setVez($vez);
+        }
+
+    }
+
     public function addPlayer(Player $newPlayer): void
     {
-        $newPlayer->setPedras($this->sortearSetePedras());
+        // $newPlayer->setPedras($this->sortearSetePedras());
         
         // $this->players[$newPlayer->getId()] = $newPlayer;
         $this->players[] = $newPlayer;
 
-        var_dump($this->players);
+        if (count($this->players) == 4) {
+            $this->start();
+        }
+
+        // var_dump($this->players);
 
         // array_push($this->players, [
         //     $id => $newPlayer

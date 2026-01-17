@@ -1,28 +1,30 @@
 class Player {
     nome = "";
-    mao = []
-    numeroVez = null;
+    pedras = []
+    vez = null;
     pontos = 0;
 
-    constructor(mao, numeroVez) {
-        this.mao = mao;
-        this.numeroVez = numeroVez;
+    constructor(nome, pedras, pontos, vez) {
+        this.nome = nome;
+        this.pedras = pedras;
+        this.pontos = pontos;
+        this.vez = vez;
     }
 
     renderizarMao() {
-        let divPlayer1 = document.querySelector(`#player_${this.numeroVez}`);
+        let divPlayer1 = document.querySelector(`#player_${this.vez}`);
 
-        this.mao.forEach(pedra => {
+        this.pedras.forEach(pedra => {
             divPlayer1.appendChild(pedra.renderizar());
         });
     }
 
     verMao() {
-        return this.mao;
+        return this.pedras;
     }
 
     buscarPedra(direita, esquerda) {
-        return this.mao.find(pedra => pedra.buscar(direita, esquerda));
+        return this.pedras.find(pedra => pedra.buscar(direita, esquerda));
     }
 
     pontuar(pontos) {
